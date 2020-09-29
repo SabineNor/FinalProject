@@ -7,16 +7,16 @@ object NewDatabase extends App {
     val sqlite_home = environmentVars.get("SQLITE_HOME").replace("\\", "/")
     val dbname = "playlist.db"
     val url = s"jdbc:sqlite:$sqlite_home/db/$dbname"
-
+   
     val conn = DriverManager.getConnection(url)
     val sql =
         """
           |CREATE TABLE IF NOT EXISTS Playlist (
-          |TITLE TEXT NOT NULL,
-          |GENRE TEXT NOT NULL,
-          |STUDIO TEXT NOT NULL,
-          |RATING INTEGER NOT NULL,
-          |YEAR INTEGER NOT NULL;
+          |title TEXT NOT NULL,
+          |genre TEXT NOT NULL,
+          |lead_studio TEXT NOT NULL,
+          |audience_score INTEGER NOT NULL,
+          |year INTEGER NOT NULL;
           |""".stripMargin
 
     val statement = conn.createStatement()
@@ -27,12 +27,16 @@ object NewDatabase extends App {
      */
     val insertSql =
         """
-          |INSERT INTO contacts (
-          |first_name, last_name, email, phone)
+          |INSERT INTO Playlist (
+          |title, genre, lead_studio, audience_score, year)
           |VALUES(?,?,?,?)
           |""".stripMargin
 
     val preparedStatement = conn.prepareStatement(insertSql)
+   ....foreach(...(preparedStatement, _))//TODO create the writer
+    preparedStatement.executeBatch()
+
+    preparedStatement.close()
 
 
 
