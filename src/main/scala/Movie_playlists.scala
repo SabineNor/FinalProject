@@ -71,7 +71,7 @@ object Movie_playlists extends App{
   var userGenre = readLine ("(R)omance, (C)omedy, (D)rama, (A)nimation? or (Ac)tion? ")
 
   //Filters to Playlists
-  def getTop5byAudScore: Seq[MovieClass] = { //FIXME or TODO to create prettyPrint to get rid of the text "MovieClass" before the results?
+  def getTop5byAudScore: Seq[MovieClass] = {
     val rawSplit = getParsedLines(srcName)
     val filteredResults = rawSplit.filter(_.size == 8) // gets lines with split size 8
     val ourMovies = getMovieClassSeq(filteredResults.slice(1, filteredResults.size)) // maps MovieClass with each split element
@@ -86,12 +86,14 @@ object Movie_playlists extends App{
     val sortByTomScore = ourMovies.sortBy(_.rotten_tomatoes_score).reverse.filter(_.genre.startsWith(userGenre)).slice(0, 5)
     sortByTomScore
   }
-
+  val top5a = getTop5byAudScore
+  val top5t = getTop5RotTom
+  val tops = top5a ++ top5t
   val top5Audience = "TOP 5 MOVIES BY AUDIENCE SCORE: \r\n"
   val top5Tomatoes = "TOP 5 MOVIES FROM ROTTEN TOMATOES \r\n"
 
   // Saving yielded data
-  def saveSeq(destName:String, mySeq:Seq[MovieClass], mySeq2:Seq[MovieClass]) = {
+  def saveSeq(destName:String, mySeq:Seq[String], mySeq2:Seq[String]) = {
     if (userGenre == "Ac") {
       println(s"Sorry we have only one action movie. Its details are saved: $destName")
     } else
@@ -103,18 +105,20 @@ object Movie_playlists extends App{
     mySeq2.map(_ + "\r\n").foreach(fw.write)
     fw.close()
   }
+// creates a more appealing look
+  def prettyPrint(top: MovieClass): String = {
+    s"Title: ${top.title} - Genre: ${top.genre} - Studio: ${top.lead_studio} " +
+      s"- Audience score: ${top.audience_score} - Rotten score: ${top.rotten_tomatoes_score} - Year: ${top.year}"
+  }
 
   val mySeq = openSource(srcName)
-  saveSeq(dstName,getTop5byAudScore,getTop5RotTom)
+  val top5aClean = top5a.map(prettyPrint(_))
+  val top5tClean = top5t.map(prettyPrint(_))
+  saveSeq(dstName,top5aClean,top5tClean)
 
-  //TODO how to get rid of the text "MovieClass" before the results?
-  //TODO How to print only Title, Genre, Studio, Both Scores and Year? Otherwise the results look kinda ugly.
-  //This actually might be already integrated in the MovieClass PrettyPrint
 
   //Database source material + creates a database + inserts the rows
-  val top5a = getTop5byAudScore
-  val top5t = getTop5RotTom
-  val tops = top5a ++ top5t
+
   val playlistDB = NewDatabase.createNewDatabase()
   val writing = WriteDatabase.writeDatabase(tops, "playlist.db")
 
