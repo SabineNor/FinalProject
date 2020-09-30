@@ -111,6 +111,14 @@ object Movie_playlists extends App{
   //TODO How to print only Title, Genre, Studio, Both Scores and Year? Otherwise the results look kinda ugly.
   //This actually might be already integrated in the MovieClass PrettyPrint
 
+  //Database source material + creates a database + inserts the rows
+  val top5a = getTop5byAudScore
+  val top5t = getTop5RotTom
+  val tops = top5a ++ top5t
+  val playlistDB = NewDatabase.createNewDatabase()
+  val writing = WriteDatabase.writeDatabase(tops, "playlist.db")
+
 }
-//TODO create db and save the results there
+
+
 
