@@ -70,13 +70,15 @@ object Movie_playlists extends App{
   val userName = readLine("What is your name? ")
   println(s"$userName, what kind of movie genre do you prefer:")
   var userGenre = readLine ("Romance, Comedy, Drama, Animation? or Action? ")
+  //removes first letter, so that User's Input is not case sensitive
+  val uniUserGenre = userGenre.substring(1)
 
   //Filters to Playlists
   def getTop5byAudScore: Seq[MovieClass] = {
     val rawSplit = getParsedLines(srcName)
     val filteredResults = rawSplit.filter(_.size == 8) // gets lines with split size 8
     val ourMovies = getMovieClassSeq(filteredResults.slice(1, filteredResults.size)) // maps MovieClass with each split element
-    val sortByAudScore = ourMovies.sortBy(_.audience_score).reverse.filter(_.genre == userGenre).slice(0, 5).distinct
+    val sortByAudScore = ourMovies.sortBy(_.audience_score).reverse.filter(_.genre.contains(uniUserGenre)).slice(0, 5).distinct
     sortByAudScore
   }
 
@@ -86,7 +88,7 @@ object Movie_playlists extends App{
     val filteredResults = rawSplit.filter(_.size == 8)
     // connects MovieClass with each split element
     val ourMovies = getMovieClassSeq(filteredResults.slice(1, filteredResults.size))
-    val sortByTomScore = ourMovies.sortBy(_.rotten_tomatoes_score).reverse.filter(_.genre == userGenre).slice(0, 5).distinct
+    val sortByTomScore = ourMovies.sortBy(_.rotten_tomatoes_score).reverse.filter(_.genre.contains(uniUserGenre)).slice(0, 5).distinct
     sortByTomScore
   }
 
