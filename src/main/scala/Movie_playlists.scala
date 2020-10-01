@@ -81,8 +81,10 @@ object Movie_playlists extends App{
 
   def getTop5RotTom: Seq[MovieClass] = {
     val rawSplit = getParsedLines(srcName)
-    val filteredResults = rawSplit.filter(_.size == 8) // gets lines with split size 8
-    val ourMovies = getMovieClassSeq(filteredResults.slice(1, filteredResults.size)) // connects MovieClass with each split element
+    // gets lines with split size 8
+    val filteredResults = rawSplit.filter(_.size == 8)
+    // connects MovieClass with each split element
+    val ourMovies = getMovieClassSeq(filteredResults.slice(1, filteredResults.size))
     val sortByTomScore = ourMovies.sortBy(_.rotten_tomatoes_score).reverse.filter(_.genre.startsWith(userGenre)).slice(0, 5)
     sortByTomScore
   }
