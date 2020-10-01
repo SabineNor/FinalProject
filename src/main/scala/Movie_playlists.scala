@@ -69,14 +69,14 @@ object Movie_playlists extends App{
   //Code for the User's Input
   val userName = readLine("What is your name? ")
   println(s"$userName, what kind of movie genre do you prefer:")
-  var userGenre = readLine ("(R)omance, (C)omedy, (D)rama, (A)nimation? or (Ac)tion? ")
+  var userGenre = readLine ("Romance, Comedy, Drama, Animation? or Action? ")
 
   //Filters to Playlists
   def getTop5byAudScore: Seq[MovieClass] = {
     val rawSplit = getParsedLines(srcName)
     val filteredResults = rawSplit.filter(_.size == 8) // gets lines with split size 8
     val ourMovies = getMovieClassSeq(filteredResults.slice(1, filteredResults.size)) // maps MovieClass with each split element
-    val sortByAudScore = ourMovies.sortBy(_.audience_score).reverse.filter(_.genre.startsWith(userGenre)).slice(0, 5)
+    val sortByAudScore = ourMovies.sortBy(_.audience_score).reverse.filter(_.genre == userGenre).slice(0, 5).distinct
     sortByAudScore
   }
 
@@ -86,7 +86,7 @@ object Movie_playlists extends App{
     val filteredResults = rawSplit.filter(_.size == 8)
     // connects MovieClass with each split element
     val ourMovies = getMovieClassSeq(filteredResults.slice(1, filteredResults.size))
-    val sortByTomScore = ourMovies.sortBy(_.rotten_tomatoes_score).reverse.filter(_.genre.startsWith(userGenre)).slice(0, 5)
+    val sortByTomScore = ourMovies.sortBy(_.rotten_tomatoes_score).reverse.filter(_.genre == userGenre).slice(0, 5).distinct
     sortByTomScore
   }
 
@@ -95,17 +95,22 @@ object Movie_playlists extends App{
   val tops = top5a ++ top5t
   val top5Audience = "TOP 5 MOVIES BY AUDIENCE SCORE: \r\n"
   val top5Tomatoes = "TOP 5 MOVIES FROM ROTTEN TOMATOES \r\n"
+  //counts how much results are per TOP section
+  val destLineCount = (getLineCount(dstName)-2)/2
 
   // Saving yielded data
   def saveSeq(destName:String, mySeq:Seq[String], mySeq2:Seq[String]) = {
-    if (userGenre == "Ac") {
-      println(s"Sorry we have only one action movie. Its details are saved: $destName")
-    } else
-      println(s"\r\nNice choice! Your TOP5 movie list is saved: $destName")
+    if (destLineCount <= 1) {
+      println(s"Nice choice, but we have only $destLineCount $userGenre movie. Its details are saved: $destName")
+    } else if (destLineCount <5) {
+      println(s"\r\nNice choice, but we have only $destLineCount $userGenre movies in our list." +
+              s"Your TOP$destLineCount  movie list is saved: $destName")
+    } else println(s"\r\nNice choice! Your TOP$destLineCount movie list is saved: $destName")
+//
     val fw = new FileWriter(destName)
     fw.write(s"$top5Audience")//gets new section/playlist
     mySeq.map(_ + "\r\n").foreach(fw.write)
-    fw.write(s"\r\n $top5Tomatoes")
+    fw.write(s"\r\n$top5Tomatoes")
     mySeq2.map(_ + "\r\n").foreach(fw.write)
     fw.close()
   }
