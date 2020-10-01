@@ -2,13 +2,15 @@ import java.sql.DriverManager
 
 // creates a database out of the Top5 choices
 
-object NewDatabase {
+object NewDatabase extends App {
     def createNewDatabase() = {
         val environmentVars = System.getenv()
         val sqlite_home = environmentVars.get("SQLITE_HOME").replace("\\", "/")
         val dbname = "playlist.db"
         val url = s"jdbc:sqlite:$sqlite_home/db/$dbname"
-   
+        val printUrl = url.replace("/","\\").slice(12,url.size)
+        println(s"Your movies are stored also in a database: $printUrl")
+
         val conn = DriverManager.getConnection(url)
         val sql =
             """
@@ -25,7 +27,6 @@ object NewDatabase {
 
             val statement = conn.createStatement()
             val resultSet = statement.execute(sql)
-
 }
 }
 

@@ -1,10 +1,13 @@
 import java.io.FileWriter
 import scala.io.StdIn.readLine
 
+// Data source for movieDB: https://gist.github.com/tiangechen/b68782efa49a16edaf07dc2cdaa855ea
+
 object Movie_playlists extends App{
 
 // Getting the text file from the User Directory
-  val userDir = System.getProperty("user.dir") // UserDirectory makes the code more universal
+
+  val userDir = System.getProperty("user.dir")
   val srcName = s"$userDir/movieDB.txt"
   val dstName = s"$userDir/DesiredPlaylist.txt"
 
@@ -13,8 +16,6 @@ object Movie_playlists extends App{
     val myLines = filePointer.getLines.toSeq
     myLines
   }
-
-//TODO to get rid of duplicate (Gnomeo and Juliet)
 
   //Counts lines in the file
   def getLineCount(fileName: String): Int = {
@@ -57,12 +58,12 @@ object Movie_playlists extends App{
   }
 
   //Printing results in IntellJ - for Data validation and User Input
-  val lineCount = getLineCount(srcName)
-  println(s"We got $lineCount movies in our list.")
-  val myLineSplits = getLineSplits(srcName)
-  val dataValid = if (myLineSplits.min == myLineSplits.max)
-    println(s"We checked that there are no missing data in our movie list. " +
-      s"It is ok to proceed with your movie choice!\n")
+    val lineCount = getLineCount(srcName)
+    println(s"We got $lineCount movies in our list.")
+    val myLineSplits = getLineSplits(srcName)
+    val dataValid = if (myLineSplits.min == myLineSplits.max)
+      println(s"We checked that there are no missing data in our movie list. " +
+        s"It is ok to proceed with your movie choice!\n")
     else println("Some lines might be missing some data. Please check!")
 
   //Code for the User's Input
@@ -88,6 +89,7 @@ object Movie_playlists extends App{
     val sortByTomScore = ourMovies.sortBy(_.rotten_tomatoes_score).reverse.filter(_.genre.startsWith(userGenre)).slice(0, 5)
     sortByTomScore
   }
+
   val top5a = getTop5byAudScore
   val top5t = getTop5RotTom
   val tops = top5a ++ top5t
@@ -99,7 +101,7 @@ object Movie_playlists extends App{
     if (userGenre == "Ac") {
       println(s"Sorry we have only one action movie. Its details are saved: $destName")
     } else
-      println(s"Nice choice! Your TOP5 movie list is saved: $destName")
+      println(s"\r\nNice choice! Your TOP5 movie list is saved: $destName")
     val fw = new FileWriter(destName)
     fw.write(s"$top5Audience")//gets new section/playlist
     mySeq.map(_ + "\r\n").foreach(fw.write)
@@ -107,6 +109,7 @@ object Movie_playlists extends App{
     mySeq2.map(_ + "\r\n").foreach(fw.write)
     fw.close()
   }
+
 // creates a more appealing look
   def prettyPrint(top: MovieClass): String = {
     s"Title: ${top.title} - Genre: ${top.genre} - Studio: ${top.lead_studio} " +
@@ -118,9 +121,7 @@ object Movie_playlists extends App{
   val top5tClean = top5t.map(prettyPrint(_))
   saveSeq(dstName,top5aClean,top5tClean)
 
-
   //Database source material + creates a database + inserts the rows
-
   val playlistDB = NewDatabase.createNewDatabase()
   val writing = WriteDatabase.writeDatabase(tops, "playlist.db")
 
